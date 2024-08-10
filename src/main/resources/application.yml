@@ -1,6 +1,21 @@
 spring:
+  application:
+    name: pass-batch
+  config:
+    activate:
+      on-profile: local
   datasource:
-    url:
-    username:
-    password:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
