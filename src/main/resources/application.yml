@@ -12,7 +12,7 @@ spring:
       maximum-pool-size: 20
   batch:
     job:
-      enabled: false
+      enabled: true
     jdbc:
       initialize-schema: always
 logging:
