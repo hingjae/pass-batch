@@ -24,4 +24,14 @@ public class BulkPassEntity {
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
 
+    public PassEntity toPassEntity(String userId) {
+        PassEntity passEntity = new PassEntity();
+        passEntity.setPackageSeq(packageSeq);
+        passEntity.setUserId(userId);
+        passEntity.setStatus(PassStatus.READY);
+        passEntity.setRemainingCount(count);
+        passEntity.setStartedAt(startedAt);
+        passEntity.setEndedAt(endedAt);
+        return passEntity;
+    }
 }
