@@ -1,18 +1,21 @@
 package com.fastcampus.pass.job;
 
-import com.fastcampus.pass.repository.pass.PassRepository;
 import com.fastcampus.pass.repository.pass.PassEntity;
+import com.fastcampus.pass.repository.pass.PassRepository;
 import com.fastcampus.pass.repository.pass.PassStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,6 +43,15 @@ class ExpirePassesJobConfigTest {
     @Autowired
     private RollbackBatchMetaDataService rollbackBatchMetaDataService;
 
+    @Autowired
+    @Qualifier("expirePassesJob")
+    private Job expirePassesJob;
+
+    @BeforeEach
+    public void setJob() {
+        jobLauncherTestUtils.setJob(expirePassesJob);
+    }
+
     @AfterEach
     public void rollBack() {
         rollbackBatchMetaDataService.clearBatchMetadata();
@@ -55,7 +67,6 @@ class ExpirePassesJobConfigTest {
         int size = 500;
         addPassEntities(size);
 
-        log.info("[Batch Job Start!!!!!!!!!!!!]");
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         JobInstance jobInstance = jobExecution.getJobInstance();
         List<PassEntity> passes = passRepository.findAll();
