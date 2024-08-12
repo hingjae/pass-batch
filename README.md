@@ -9,11 +9,12 @@ Spring Batch를 사용한 프로젝트를 따라 만들어보고, Spring Boot 3.
 - Spring Boot 3.2
 - MySQL
 - JPA
+- Spring Batch 5
 
 ### 공부한 내용
 
 - Docker compose
-  - https://hub.docker.com 에 이미지를 검색한 내용을 참고.
+  - https://hub.docker.com 에 이미지를 검색 후 참고해서 작성.
   - 컨테이너는 삭제될 때 마다 데이터도 삭제된다. 따라서 영구적 보관이 필요한 데이터는 볼륨을 만들어 관리한다.
     - DB 설정 파일 : custom.cnf
     - DDL 쿼리, 초키 데이터

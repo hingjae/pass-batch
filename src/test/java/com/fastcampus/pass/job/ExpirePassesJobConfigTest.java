@@ -1,6 +1,6 @@
 package com.fastcampus.pass.job;
 
-import com.fastcampus.pass.repository.PassRepository;
+import com.fastcampus.pass.repository.pass.PassRepository;
 import com.fastcampus.pass.repository.pass.PassEntity;
 import com.fastcampus.pass.repository.pass.PassStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +76,6 @@ class ExpirePassesJobConfigTest {
         PassEntity passEntity = getPassEntity(500, 10, tommorowLocalDateTime);
         passRepository.save(passEntity);
 
-        log.info("[Batch Job Start!!!!!!!!!!!!]");
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         JobInstance jobInstance = jobExecution.getJobInstance();
         List<PassEntity> notEndedPass = passRepository.findAll().stream()
