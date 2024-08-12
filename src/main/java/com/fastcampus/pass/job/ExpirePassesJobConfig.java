@@ -53,12 +53,12 @@ public class ExpirePassesJobConfig {
      */
     @Bean
     public ItemReader<PassEntity> expirePassesItemReader() {
-        String expirePassesItemReaderQuery = """
-                select p
-                from PassEntity p
-                where p.status = :status and
-                        p.endedAt <= :endedAt
-                """;
+        final String expirePassesItemReaderQuery = """
+                    select p
+                    from PassEntity p
+                    where p.status = :status and
+                            p.endedAt <= :endedAt
+                    """;
         return new JpaCursorItemReaderBuilder<PassEntity>()
                 .entityManagerFactory(entityManagerFactory)
                 .name("expirePassesItemReader")
