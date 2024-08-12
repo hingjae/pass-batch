@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "user_group_mapping")
-@IdClass(UserGroupMappingId.class)
+@IdClass(UserGroupMappingId.class) // 복합키 사용.
 public class UserGroupMappingEntity extends BaseEntity {
     @Id
     private String userGroupId;
