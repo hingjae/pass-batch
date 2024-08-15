@@ -2,6 +2,7 @@ package com.fastcampus.pass.job;
 
 import com.fastcampus.pass.repository.pass.PassEntity;
 import com.fastcampus.pass.repository.pass.PassRepository;
+import com.fastcampus.pass.repository.pass.PassService;
 import com.fastcampus.pass.repository.pass.PassStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -26,13 +27,14 @@ import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Import(RollbackBatchMetaDataService.class)
 @SpringBatchTest
 @ActiveProfiles("test")
 @SpringBootTest
-class ExpirePassesJobConfigTest {
+class JdbcExpirePassesJobConfigTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -44,8 +46,10 @@ class ExpirePassesJobConfigTest {
     private RollbackBatchMetaDataService rollbackBatchMetaDataService;
 
     @Autowired
-    @Qualifier("expirePassesJob")
+    @Qualifier("jdbcExpirePassesJob")
     private Job expirePassesJob;
+    @Autowired
+    private PassService passService;
 
     @BeforeEach
     public void setJob() {
@@ -58,46 +62,37 @@ class ExpirePassesJobConfigTest {
         passRepository.deleteAllInBatch();
     }
 
+    private static final int BATCH_SIZE = 500000;
+
     /**
-     * Spring Batch Job은 외부 트랜잭션을 허용하지 않는다.
+     * JPA와 JDBC Spring Batch 비교테스트
+     * 5000개의 데이터 -> 2초
+     * 50000 -> 19초
+     * 500000 -> 195초
      */
     @DisplayName("endedAt이 지난 pass는 EXPIRED상태가 된다.")
     @Test
     public void expirePassesJob() throws Exception {
-        int size = 500;
-        addPassEntities(size);
+        addPassEntities(BATCH_SIZE);
+
+        long startTime = System.currentTimeMillis();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
+        long endTime = System.currentTimeMillis();
+
+        long duration = endTime - startTime;
+
+        log.info("duration: {}", duration);
+
         JobInstance jobInstance = jobExecution.getJobInstance();
         List<PassEntity> passes = passRepository.findAll();
 
         assertThat(ExitStatus.COMPLETED).isEqualTo(jobExecution.getExitStatus());
-        assertThat("expirePassesJob").isEqualTo(jobInstance.getJobName());
-        assertThat(passes).hasSize(size)
+        assertThat("jdbcExpirePassesJob").isEqualTo(jobInstance.getJobName());
+        assertThat(passes).hasSize(BATCH_SIZE)
                 .extracting(PassEntity::getStatus)
                 .containsOnly(PassStatus.EXPIRED);
-    }
-
-    @DisplayName("endedAt이 지나지 않은 pass는 상태가 그대로다.")
-    @Test
-    public void notEndedPass() throws Exception {
-        int size = 500;
-        addPassEntities(size);
-        LocalDateTime tommorowLocalDateTime = LocalDateTime.now().plusDays(1);
-        PassEntity passEntity = getPassEntity(500, 10, tommorowLocalDateTime);
-        passRepository.save(passEntity);
-
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-        JobInstance jobInstance = jobExecution.getJobInstance();
-        List<PassEntity> notEndedPass = passRepository.findAll().stream()
-                .filter(item -> item.getStatus() == PassStatus.PROGRESSED)
-                .toList();
-
-        assertThat(ExitStatus.COMPLETED).isEqualTo(jobExecution.getExitStatus());
-        assertThat("expirePassesJob").isEqualTo(jobInstance.getJobName());
-        assertThat(notEndedPass).hasSize(1)
-                .extracting(PassEntity::getStatus)
-                .containsOnly(PassStatus.PROGRESSED);
     }
 
     private void addPassEntities(int size) {

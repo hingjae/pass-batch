@@ -22,4 +22,8 @@ Spring Batch를 사용한 프로젝트를 따라 만들어보고, Spring Boot 3.
   - 환경변수 설정
 - Batch
   - Job 등록
+    - Tasklet 방식
+    - Chunk 방식
   - 통합 테스트
+  - batch job을 jpa, jdbc로 각각 구현했을 때 성능 비교
+    - JDBC > JPA 
