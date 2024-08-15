@@ -25,23 +25,23 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class ExpirePassesJobConfig {
-    private final int CHUNK_SIZE = 100;
+public class JpaExpirePassesJobConfig {
+    private final int CHUNK_SIZE = 1000;
 
     private final EntityManagerFactory entityManagerFactory;
 
     @Bean
-    public Job expirePassesJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new JobBuilder("expirePassesJob", jobRepository)
-                .start(expirePassesStep(jobRepository, transactionManager))
+    public Job jpaExpirePassesJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new JobBuilder("jpaExpirePassesJob", jobRepository)
+                .start(jpaExpirePassesStep(jobRepository, transactionManager))
                 .build();
     }
 
     @Bean
-    public Step expirePassesStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("expirePassesStep", jobRepository)
+    public Step jpaExpirePassesStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("jpaExpirePassesStep", jobRepository)
                 .<PassEntity, PassEntity>chunk(CHUNK_SIZE, transactionManager)
-                .reader(expirePassesItemReader())
+                .reader(jpaExpirePassesItemReader())
                 .processor(expirePassesItemProcessor())
                 .writer(expirePassesItemWriter())
                 .build();
@@ -52,7 +52,7 @@ public class ExpirePassesJobConfig {
      * 페이징 기법보다 보다 높은 성능으로, 데이터 변경에 무관한 무결성 조회가 가능합니다.
      */
     @Bean
-    public ItemReader<PassEntity> expirePassesItemReader() {
+    public ItemReader<PassEntity> jpaExpirePassesItemReader() {
         final String expirePassesItemReaderQuery = """
                     select p
                     from PassEntity p
@@ -61,7 +61,7 @@ public class ExpirePassesJobConfig {
                     """;
         return new JpaCursorItemReaderBuilder<PassEntity>()
                 .entityManagerFactory(entityManagerFactory)
-                .name("expirePassesItemReader")
+                .name("jpaExpirePassesItemReader")
                 .queryString(expirePassesItemReaderQuery)
                 .parameterValues(Map.of("status", PassStatus.PROGRESSED, "endedAt", LocalDateTime.now()))
                 .build();
