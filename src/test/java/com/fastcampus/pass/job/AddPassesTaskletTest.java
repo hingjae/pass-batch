@@ -1,5 +1,6 @@
 package com.fastcampus.pass.job;
 
+import com.fastcampus.pass.job.pass.AddPassesTasklet;
 import com.fastcampus.pass.repository.pass.*;
 import com.fastcampus.pass.repository.user.UserGroupMappingEntity;
 import com.fastcampus.pass.repository.user.UserGroupMappingRepository;

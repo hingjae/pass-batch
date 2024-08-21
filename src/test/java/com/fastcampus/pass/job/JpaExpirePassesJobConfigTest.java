@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,11 +62,12 @@ class JpaExpirePassesJobConfigTest {
         passRepository.deleteAllInBatch();
     }
 
-    private static final int BATCH_SIZE = 500000;
+    private static final int BATCH_SIZE = 5000;
 
     /**
      * Spring Batch Job은 외부 트랜잭션을 허용하지 않는다.
      * 5000개 5초 (개선이 필요함.)
+     * 50000개 50초
      * 500000개 500초
      */
     @DisplayName("endedAt이 지난 pass는 EXPIRED상태가 된다.")
@@ -94,12 +96,13 @@ class JpaExpirePassesJobConfigTest {
     }
 
     /**
-     * 일반 메서드와 Spring Batch 비교테스트
-     * 5000개의 데이터 -> 2.5초
+     * 일반 JPA 메서드와 Spring Batch 비교테스트
+     * 5000 -> 2.5초
      * 50000 -> 22
+     * 500000 -> error
      */
     @Test
-    public void test() {
+    public void generalJpaMethodTest() {
         addPassEntities(BATCH_SIZE);
 
         long startTime = System.currentTimeMillis();
