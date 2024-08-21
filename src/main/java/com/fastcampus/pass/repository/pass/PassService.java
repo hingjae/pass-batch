@@ -16,10 +16,10 @@ public class PassService {
     @Transactional
     public void expiredPasses() {
         List<PassEntity> passes = passRepository.findAllByStatusAAndEndedAt(PassStatus.PROGRESSED, LocalDateTime.now());
-
+        LocalDateTime now = LocalDateTime.now();
         for (PassEntity pass : passes) {
             pass.setStatus(PassStatus.EXPIRED);
-            pass.setExpiredAt(LocalDateTime.now());
+            pass.setExpiredAt(now);
         }
     }
 }

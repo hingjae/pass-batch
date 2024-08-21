@@ -62,13 +62,13 @@ class JdbcExpirePassesJobConfigTest {
         passRepository.deleteAllInBatch();
     }
 
-    private static final int BATCH_SIZE = 500000;
+    private static final int BATCH_SIZE = 5000;
 
     /**
      * JPA와 JDBC Spring Batch 비교테스트
-     * 5000개의 데이터 -> 2초
-     * 50000 -> 19초
-     * 500000 -> 195초
+     * 5000 -> 2초
+     * 50000 -> 약 20초
+     * 500000 -> 약 200초
      */
     @DisplayName("endedAt이 지난 pass는 EXPIRED상태가 된다.")
     @Test

@@ -1,6 +1,5 @@
-package com.fastcampus.pass.job;
+package com.fastcampus.pass.job.pass;
 
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
